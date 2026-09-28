@@ -176,6 +176,12 @@ td.num,th.num{text-align:right}
 .betCard{width:100%;max-width:420px;background:#fff;border-radius:20px;padding:18px;
   border-top:10px solid var(--gold);box-shadow:0 20px 50px rgba(0,0,0,.5)}
 .betCard h2{font-size:21px;margin:6px 0}
+.invRow{display:flex;align-items:center;gap:8px;margin-top:10px;padding:10px;border-radius:12px;
+  border:2px solid #cfc4ec;background:#fff}
+.invRow .nm{flex:1;font-weight:900;font-size:13px}
+.betAmt{width:92px;text-align:center;font-family:'Lilita One';font-size:17px;
+  border:2px solid #cfc4ec;border-radius:10px;padding:8px 4px;color:var(--ink)}
+.betAmt:focus{outline:3px solid var(--gold)}
 .stakeRow{display:flex;gap:8px;margin-top:12px}
 .stakeRow button{flex:1;padding:13px 6px;border-radius:12px;border:2px solid #cfc4ec;background:#fff;
   font-family:'Lilita One';font-size:15px;cursor:pointer;color:var(--ink)}
@@ -237,14 +243,19 @@ try{
       <b>Your 30-second run:</b> 🪙 Coins <b>+10</b> · Brand tokens 🎀🫀✨ <b>+25 &amp; 2× for 6s</b> ·
       🛑 Barriers <b>−30</b> · 🎯 Brand Challenge <b>+100</b> · ⏱️ Last 8s = <b>Rush Hour</b>.<br>
       📊 Your best run lands on the live <b>Score Board</b> everyone can watch.<br>
-      🗳️ <b>AI Project Bets:</b> every player stakes their coins on the AI projects they believe in — <b>maximum 2 projects each</b>. The pools crown the <b>Top 3 AI Projects</b> live on the Bet Board.<br>
+      🗳️ <b>AI Project Bets:</b> every player on the Score Board can bet on <b>ALL the listed projects</b> — type an amount next to each project you back, up to your total run coins. Pools update live; top 3 projects take the podium.<br>
       📱 Tap left / right half · 💻 ⬅️➡️ or A/D · ⛶ fullscreen
     </div>
-    <label class="small" style="text-align:left">YOUR NAME</label>
-    <input type="text" id="playerName" maxlength="16" placeholder="e.g. Aisyah">
+    <div style="width:100%;background:#fff;border-radius:16px;padding:14px 16px;margin-top:10px;
+      box-shadow:0 8px 22px rgba(75,42,143,.16);border-top:8px solid var(--kisqali)">
+      <div style="font-weight:900;font-size:12px;color:#5f5486;text-align:left">🏃 YOUR NAME — shown in-game and on the live boards</div>
+      <input type="text" id="playerName" maxlength="16" placeholder="Type your name…"
+        style="margin-top:8px;text-align:center;font-size:17px;font-weight:900">
+      <button class="big" id="playBtn" style="margin-top:10px">PLAY MY RUN ▸</button>
+    </div>
     <button id="testSnd">🎵 TAP TO TEST SOUND</button>
-    <button class="big" id="playBtn">PLAY MY RUN ▸</button>
     <button class="big" id="boardsBtn" style="background:#4b2a8f;box-shadow:0 6px 0 #2a1b5e,0 12px 24px rgba(75,42,143,.35)">📊 LIVE BOARDS · EVERYONE CAN WATCH ▸</button>
+    <button class="big" id="betBoardBtn" style="background:#b8005f;box-shadow:0 6px 0 #7d0040,0 12px 24px rgba(184,0,95,.35)">🗳️ AI PROJECT BET BOARD ▸</button>
   </div>
 
   <!-- GAME -->
@@ -297,7 +308,6 @@ try{
     <div id="hostPanel" class="hostbar">
       <button id="revealBtn" class="big" style="margin-top:0;padding:11px;font-size:14px;flex:1">🙈 HIDE BOARDS</button>
       <button id="projBtn" class="big" style="margin-top:0;padding:11px;font-size:14px;flex:1;background:#4b2a8f;box-shadow:0 6px 0 #2a1b5e">🎨 PROJECTS</button>
-      <button id="shareBtn2" class="big" style="margin-top:0;padding:11px;font-size:14px;flex:1;background:#c78f00;box-shadow:0 6px 0 #8f6600">🔗 LINKS</button>
       <button id="addScoreBtn" class="big" style="margin-top:0;padding:11px;font-size:14px;flex:1;background:#00925a;box-shadow:0 6px 0 #00713f">➕ SCORE</button>
       <button id="xlsBtn" class="big" style="margin-top:0;padding:11px;font-size:14px;flex:1;background:#2a4d8f;box-shadow:0 6px 0 #1b3563">⬇️ EXCEL</button>
       <button id="resetBtn" class="big" style="margin-top:0;padding:11px;font-size:14px;flex:1;background:var(--red);box-shadow:0 6px 0 #b3213c">🧹 RESET ALL</button>
@@ -312,8 +322,11 @@ try{
       </table></div>
     </div>
     <div class="tile bet">
-      <h3>🗳️ AI PROJECT BET BOARD</h3>
-      <div class="sub">Back up to 2 projects with your coins — top 3 take the podium</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
+        <h3 style="margin:0">🗳️ AI PROJECT BET BOARD</h3>
+        <button id="projEditBtn" style="padding:7px 12px;border-radius:10px;border:2px solid #cfc4ec;background:#fff;font-family:'Nunito';font-weight:900;font-size:12px;cursor:pointer;color:var(--ink)">✏️ PROJECT NAMES</button>
+      </div>
+      <div class="sub">Type your stake into any of the projects — top 3 take the podium</div>
       <div class="tscroll"><table>
         <thead><tr><th>#</th><th>AI PROJECT</th><th class="num">POOL 🪙</th><th class="num">BACKERS</th></tr></thead>
         <tbody id="bbBody"></tbody>
@@ -614,6 +627,10 @@ $("testSnd").onclick=e=>{
     ?"✅ SOUND IS ON — DID YOU HEAR THE FANFARE?"
     :"⚠️ BLOCKED HERE — OPEN IN CHROME/SAFARI & CHECK SILENT MODE";},300);
 };
+$("playerName").addEventListener("input",e=>{
+  const n=e.target.value.trim();
+  $("playBtn").textContent=n?("▶ PLAY MY RUN — "+n.toUpperCase().slice(0,12)):"PLAY MY RUN ▸";
+});
 $("playBtn").onclick=()=>{
   Snd.sfx("click");
   const n=$("playerName").value.trim();
@@ -627,6 +644,8 @@ $("playBtn").onclick=()=>{
   startShift();
 }
 $("boardsBtn").onclick=()=>{Snd.sfx("click");openBoards();};
+$("betBoardBtn").onclick=()=>{Snd.sfx("click");openBoards();
+  setTimeout(()=>{const t=document.querySelector(".tile.bet");if(t)t.scrollIntoView({behavior:"smooth",block:"start"});},400);};
 $("toBoardsBtn").onclick=()=>{Snd.sfx("click");Snd.stop();openBoards();};
 $("replayBtn").onclick=()=>{Snd.sfx("click");Snd.stop();startShift();};
 $("backBtn").onclick=()=>{Snd.stop();Snd.sfx("click");showScreen("title");};
@@ -1032,7 +1051,7 @@ function myRemaining(){
   return Math.max(0,myWallet()-used);
 }
 function betEligible(){
-  return !HOST_VIEW&&!!myName&&myWallet()>0&&projList.length>0&&myRemaining()>0;
+  return projList.length>0&&lastRows.length>0;
 }
 function updateBetCtas(){
   const on=betEligible();
@@ -1092,80 +1111,88 @@ function renderBoards(){
       "</td><td class='num'>"+(masked?"🔒":pj.backers)+"</td>";
     bb.appendChild(tr);
   });
-  if(!projRank.length)bb.innerHTML="<tr><td colspan='4'>"+(isHost?"Tap 🎨 PROJECTS to add the AI projects players can back.":"The host hasn’t added the AI projects yet — pools open soon.")+"</td></tr>";
+  if(!projRank.length)bb.innerHTML="<tr><td colspan='4'>Tap ✏️ PROJECT NAMES above to add the AI projects — then players can allocate their coins.</td></tr>";
   updateBetCtas();
 }
 
-/* ================= AI PROJECT BETS ================= */
+/* ================= AI PROJECT BETS (typed stakes, any project) ================= */
+$("projEditBtn").onclick=()=>{Snd.sfx("click");openProjEditor();};
 $("betCta").onclick=()=>{Snd.sfx("click");openBet();};
 $("betCta2").onclick=()=>{Snd.sfx("click");openBet();};
 function closeModal(){$("betModal").style.display="none";}
+function walletOf(name){
+  const r=lastRows.find(x=>slugify(x.name||"")===slugify(name||""));
+  return r?(r.score||0):null;
+}
+function allocOf(name){
+  const b=betsRows.find(x=>slugify(x.name||"")===slugify(name||""));
+  return (b&&b.alloc)?Object.assign({},b.alloc):{};
+}
+let betName="";
 function openBet(){
   if(!betEligible())return;
-  const card=$("betCard"),alloc=myAlloc(),backed=Object.keys(alloc);
-  let html="<span class='qtag' style='background:var(--kisqali)'>🗳️ BACK YOUR TOP AI PROJECTS</span>"+
-    "<h2>"+esc(myName)+" · "+myRemaining()+" 🪙 to stake</h2>"+
-    "<div style='font-weight:800;font-size:13px;color:#5f5486'>Pick a project, then a stake. You can back <b>2 projects at most</b> — add more coins to a project you already back anytime.</div>"+
-    "<div id='projPick' style='margin-top:10px'></div>"+
-    "<button class='big' id='betCancel' style='background:#5f5486;box-shadow:0 6px 0 #453e63'>DONE</button>";
-  card.innerHTML=html;
-  const box=card.querySelector("#projPick");
-  projList.forEach(pj=>{
-    const mine=alloc[pj.id]||0;
-    const locked=!mine&&backed.length>=2;
-    const b=document.createElement("button");
-    b.className="qopt";
-    b.disabled=locked;
-    b.style.opacity=locked?"0.45":"1";
-    b.innerHTML="<b>"+esc(pj.name)+"</b>"+
-      (mine?" <span style='color:#00925a'>— your stake: "+mine+" 🪙</span>":"")+
-      (locked?" <span style='color:#b3213c'>— 2-project limit reached</span>":"");
-    b.onclick=()=>{Snd.sfx("click");pickStake(pj);};
-    box.appendChild(b);
-  });
+  betName=betName||myName||"";
+  renderBetForm();
   $("betModal").style.display="flex";
+}
+function renderBetForm(){
+  const card=$("betCard");
+  const alloc=allocOf(betName);
+  card.innerHTML="<span class='qtag' style='background:var(--kisqali)'>\uD83D\uDDF3\uFE0F AI PROJECT BET BOARD</span>"+
+    "<h2>Place your bets</h2>"+
+    "<div style='font-weight:800;font-size:12.5px;color:#5f5486'>Your run coins on the Score Board are your wallet. You can bet on ALL the projects \u2014 type an amount next to each one, up to your total coins. Saving again replaces your earlier bets.</div>"+
+    "<label class='small'>YOUR NAME \u2014 exactly as on the Score Board</label>"+
+    "<input type='text' id='betWho' list='sbNames' maxlength='16' value='"+esc(betName)+"' placeholder='e.g. JC'>"+
+    "<datalist id='sbNames'>"+lastRows.map(r=>"<option value='"+esc(r.name||"")+"'>").join("")+"</datalist>"+
+    "<div id='betWallet' class='verdict' style='text-align:left;min-height:20px'></div>"+
+    "<div id='betRows'></div>"+
+    "<button class='big' id='betSave' style='margin-top:12px'>\u2705 PLACE BETS</button>"+
+    "<button class='big' id='betCancel' style='background:#5f5486;box-shadow:0 6px 0 #453e63;margin-top:8px;padding:12px;font-size:15px'>CLOSE</button>"+
+    "<div id='betMsg' style='margin-top:8px;font-weight:900;text-align:center;min-height:20px'></div>";
+  const rows=card.querySelector("#betRows");
+  projList.forEach(pj=>{
+    const row=document.createElement("div");
+    row.className="invRow";
+    row.innerHTML="<div class='nm'>"+esc(pj.name)+"</div>"+
+      "<input type='number' inputmode='numeric' min='0' step='10' class='betAmt' data-p='"+esc(pj.id)+"' value='"+(alloc[pj.id]||0)+"'>";
+    rows.appendChild(row);
+  });
+  const refresh=()=>{
+    const nm=card.querySelector("#betWho").value.trim();
+    const w=walletOf(nm);
+    let total=0;card.querySelectorAll(".betAmt").forEach(i=>total+=Math.max(0,parseInt(i.value,10)||0));
+    const el=card.querySelector("#betWallet");
+    if(w===null)el.textContent="\u26A0\uFE0F That name isn\u2019t on the Score Board yet \u2014 play a run first, or check spelling.";
+    else el.textContent="\uD83E\uDE99 Wallet "+w+" \u00B7 staked "+total+" \u00B7 left "+(w-total)+(total>w?"  \u274C over budget!":"");
+    card.querySelector("#betSave").disabled=(w===null||total<=0||total>w);
+  };
+  card.querySelector("#betWho").oninput=e=>{betName=e.target.value;refresh();};
+  card.querySelectorAll(".betAmt").forEach(i=>{i.oninput=refresh;});
+  refresh();
+  card.querySelector("#betSave").onclick=saveBets;
   card.querySelector("#betCancel").onclick=()=>{Snd.sfx("click");closeModal();};
 }
-function pickStake(pj){
-  const card=$("betCard"),rem=myRemaining(),mine=myAlloc()[pj.id]||0;
-  card.innerHTML="<span class='qtag' style='background:var(--cosentyx)'>🗳️ "+esc(pj.name)+"</span>"+
-    "<h2>Stake how much?</h2>"+
-    "<div style='font-weight:800;font-size:13px;color:#5f5486'>"+rem+" 🪙 left in your wallet"+(mine?" · already staked here: "+mine+" 🪙":"")+"</div>"+
-    "<div class='stakeRow'>"+
-    [50,100,150].filter(v=>v<rem).map(v=>"<button data-s='"+v+"'>"+v+" 🪙</button>").join("")+
-    "<button data-s='"+rem+"'>ALL · "+rem+" 🪙</button>"+
-    "</div>"+
-    "<button class='big' id='betBack' style='background:#5f5486;box-shadow:0 6px 0 #453e63'>← BACK</button>"+
-    "<div id='betMsg' style='margin-top:8px;font-weight:900;text-align:center;min-height:20px'></div>";
-  card.querySelectorAll(".stakeRow button").forEach(b=>{
-    b.onclick=async()=>{
-      Snd.sfx("click");
-      const amt=Math.max(1,Math.min(rem,parseInt(b.dataset.s,10)||1));
-      card.querySelectorAll(".stakeRow button").forEach(x=>x.disabled=true);
-      card.querySelector("#betMsg").textContent="⏳ Placing your bet…";
-      const ok=await placeStake(pj.id,amt);
-      if(ok){
-        card.querySelector("#betMsg").textContent="✅ "+amt+" 🪙 on "+pj.name+"!";
-        Snd.sfx("jackpot");vibrate([40,60,40]);
-        setTimeout(()=>{openBet();},900);
-      }else{
-        card.querySelector("#betMsg").textContent="⚠️ Couldn’t place the bet — try again.";
-        card.querySelectorAll(".stakeRow button").forEach(x=>x.disabled=false);
-      }
-    };
+async function saveBets(){
+  const card=$("betCard");
+  const name=card.querySelector("#betWho").value.trim();
+  const w=walletOf(name);
+  const alloc={};let total=0;
+  card.querySelectorAll(".betAmt").forEach(i=>{
+    const v=Math.max(0,parseInt(i.value,10)||0);
+    if(v>0){alloc[i.dataset.p]=v;total+=v;}
   });
-  card.querySelector("#betBack").onclick=()=>{Snd.sfx("click");openBet();};
-}
-async function placeStake(projId,amt){
+  if(w===null||total<=0||total>w){card.querySelector("#betMsg").textContent="\u26A0\uFE0F Check the name and amounts.";return;}
+  const b=card.querySelector("#betSave");b.disabled=true;b.textContent="SAVING\u2026";
   try{
-    const d=await getDb();if(!d)return false;
-    const cur=myAlloc(),next={};
-    for(const k in cur)if((cur[k]||0)>0)next[k]=cur[k];
-    next[projId]=(next[projId]||0)+amt;
-    if(Object.keys(next).length>2)return false;   /* hard 2-project limit */
-    await d.doc("bets/"+slugify(myName)).set({name:myName,alloc:next,at:new Date().toISOString()});
-    return true;
-  }catch(e){return false;}
+    const d=await getDb();if(!d)throw 0;
+    await d.doc("bets/"+slugify(name)).set({name,alloc,total,at:new Date().toISOString()});
+    Snd.sfx("jackpot");confetti();vibrate([40,60,40]);
+    card.querySelector("#betMsg").textContent="\u2705 Bets placed for "+name+"!";
+    setTimeout(()=>{closeModal();renderBoards();},1200);
+  }catch(e){
+    b.disabled=false;b.textContent="\u2705 PLACE BETS";
+    card.querySelector("#betMsg").textContent="\u26A0\uFE0F Couldn\u2019t save \u2014 check connection and try again.";
+  }
 }
 
 /* ---- Host: AI project list editor ---- */
@@ -1313,41 +1340,6 @@ $("xlsBtn").onclick=async()=>{
   setTimeout(()=>b.textContent="\u2B07\uFE0F EXCEL",2000);
 };
 
-/* ================= SHARE PANEL ================= */
-const GAME_URL=location.origin+location.pathname;
-function openShare(){
-  const card=$("betCard");
-  const row=(label,url,id)=>"<div style='margin-top:10px;text-align:left'>"+
-    "<div style='font-weight:900;font-size:11px;color:#5f5486'>"+label+"</div>"+
-    "<div style='display:flex;gap:6px;margin-top:4px'>"+
-    "<input readonly id='"+id+"' value='"+url+"' style='flex:1;font-size:12px;font-weight:700;padding:9px 10px'>"+
-    "<button class='copybtn' data-t='"+id+"' style='padding:0 14px;border-radius:10px;border:2px solid #cfc4ec;background:#fff;font-family:Nunito;font-weight:900;cursor:pointer'>COPY</button>"+
-    "</div></div>";
-  card.innerHTML="<span class='qtag' style='background:#00925a'>🔗 SHARE THE GAME</span>"+
-    "<h2>Two links, one setting</h2>"+
-    row("🎮 PLAYER LINK — send this to everyone",GAME_URL,"lnkP")+
-    row("🎛️ HOST BOARD LINK — projector, keep to yourself",GAME_URL+"#host","lnkH")+
-    "<div class='rules' style='margin-top:12px;text-align:left'><b>No sign-in needed:</b> anyone who opens the player link can play and bet instantly, on any device. Keep the host link and host key to yourself \u2014 they unlock the board controls.</div>"+
-    (navigator.share?"<button class='big' id='sysShare' style='margin-top:10px;padding:12px;font-size:15px'>📤 SHARE PLAYER LINK…</button>":"")+
-    "<button class='big' id='shareDone' style='background:#5f5486;box-shadow:0 6px 0 #453e63;margin-top:8px;padding:12px;font-size:15px'>DONE</button>";
-  $("betModal").style.display="flex";
-  card.querySelectorAll(".copybtn").forEach(b=>{
-    b.onclick=async()=>{
-      const inp=$(b.dataset.t);inp.focus();inp.select();
-      let ok=false;
-      try{await navigator.clipboard.writeText(inp.value);ok=true;}
-      catch(e){try{ok=document.execCommand("copy");}catch(e2){}}
-      Snd.sfx("click");
-      b.textContent=ok?"✅":"SELECTED — COPY";
-      setTimeout(()=>b.textContent="COPY",1600);
-    };
-  });
-  const ss=card.querySelector("#sysShare");
-  if(ss)ss.onclick=()=>{Snd.sfx("click");try{navigator.share({title:"APMA Brand Rush — play your run!",url:GAME_URL});}catch(e){}};
-  card.querySelector("#shareDone").onclick=()=>{Snd.sfx("click");$("betModal").style.display="none";};
-}
-$("shareBtn").onclick=()=>{Snd.sfx("click");openShare();};
-$("shareBtn2").onclick=()=>{Snd.sfx("click");openShare();};
 
 /* ================= BOOT ================= */
 startLiveFeed();
